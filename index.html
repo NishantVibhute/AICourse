@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Course</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     CONFIG (optional) — leave blank to auto-detect from the
+     GitHub Pages URL (username.github.io/repo-name).
+     ============================================================ */
+  :root {
+    --bg: #f6f7f9;
+    --surface: #ffffff;
+    --surface-2: #f1f3f6;
+    --border: #e3e6eb;
+    --text: #15181e;
+    --muted: #6b7280;
+    --accent: #2f6fed;
+    --accent-soft: #e8f0fe;
+    --folder: #e9a23b;
+    --shadow: 0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.06);
+    --shadow-hover: 0 6px 18px rgba(16,24,40,.10);
+    --radius: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1115;
+      --surface: #171a21;
+      --surface-2: #1e222b;
+      --border: #2a2f3a;
+      --text: #e8eaee;
+      --muted: #9aa3b2;
+      --accent: #6b9bff;
+      --accent-soft: #1d2a45;
+      --folder: #f0b452;
+      --shadow: 0 1px 2px rgba(0,0,0,.3);
+      --shadow-hover: 0 6px 18px rgba(0,0,0,.45);
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* Header */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .header-inner {
+    max-width: 1100px; margin: 0 auto; padding: 16px 20px;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 200px; }
+  .logo {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), #8a5cf6);
+    display: grid; place-items: center; color: #fff; flex-shrink: 0;
+  }
+  .brand h1 { font-size: 18px; font-weight: 700; letter-spacing: -.01em; }
+  .brand p { font-size: 13px; color: var(--muted); }
+  .search {
+    position: relative; flex: 0 1 340px; min-width: 200px;
+  }
+  .search input {
+    width: 100%; padding: 10px 14px 10px 38px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--surface-2); color: var(--text);
+    font: inherit; font-size: 14px; outline: none; transition: .15s;
+  }
+  .search input:focus { border-color: var(--accent); background: var(--surface); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
+
+  /* Breadcrumb + stats */
+  .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .crumbs { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; font-size: 14px; }
+  .crumbs a { color: var(--muted); padding: 4px 8px; border-radius: 6px; transition: .15s; }
+  .crumbs a:hover { background: var(--surface-2); color: var(--text); }
+  .crumbs a.current { color: var(--text); font-weight: 600; }
+  .crumbs .sep { color: var(--border); }
+  .stats { font-size: 13px; color: var(--muted); display: flex; gap: 14px; }
+  .stats b { color: var(--text); font-weight: 600; }
+
+  .section-title {
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--muted); margin: 8px 0 12px;
+  }
+
+  /* Folder grid */
+  .folders {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px; margin-bottom: 32px;
+  }
+  .folder {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px;
+    box-shadow: var(--shadow); transition: .18s; cursor: pointer;
+  }
+  .folder:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: var(--accent); }
+  .folder .ic { color: var(--folder); flex-shrink: 0; }
+  .folder .name { font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .folder .meta { font-size: 12px; color: var(--muted); }
+
+  /* File list */
+  .files {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .file {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 16px; border-bottom: 1px solid var(--border); transition: .12s;
+  }
+  .file:last-child { border-bottom: none; }
+  .file:hover { background: var(--surface-2); }
+  .badge {
+    width: 38px; height: 38px; border-radius: 9px; flex-shrink: 0;
+    display: grid; place-items: center; font-size: 10px; font-weight: 700;
+    letter-spacing: .02em; text-transform: uppercase;
+  }
+  .file .info { flex: 1; min-width: 0; }
+  .file .name { font-weight: 500; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file .path { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file .size { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .open {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: var(--accent);
+    padding: 6px 12px; border-radius: 8px; background: var(--accent-soft);
+    transition: .15s; white-space: nowrap;
+  }
+  .open:hover { filter: brightness(.95); }
+
+  /* States */
+  .state {
+    text-align: center; padding: 60px 20px; color: var(--muted);
+    background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius);
+  }
+  .state h3 { color: var(--text); font-size: 16px; margin-bottom: 6px; }
+  .spinner {
+    width: 28px; height: 28px; border: 3px solid var(--border);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin .8s linear infinite; margin: 0 auto 14px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  mark { background: #ffe58a; color: inherit; border-radius: 3px; padding: 0 1px; }
+  @media (prefers-color-scheme: dark) { mark { background: #6b5a14; } }
+
+  footer { text-align: center; font-size: 12px; color: var(--muted); padding: 24px; }
+  footer a { color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .file .size { display: none; }
+    .open span { display: none; }
+    .search { flex: 1 1 100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <div class="logo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div>
+        <h1 id="title">AI Course</h1>
+        <p id="subtitle">Browse all pages and resources</p>
+      </div>
+    </div>
+    <label class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="q" type="search" placeholder="Search files…" autocomplete="off">
+    </label>
+  </div>
+</header>
+
+<main>
+  <div class="toolbar">
+    <nav class="crumbs" id="crumbs"></nav>
+    <div class="stats" id="stats"></div>
+  </div>
+  <div id="content">
+    <div class="state"><div class="spinner"></div>Loading files…</div>
+  </div>
+</main>
+
+<footer id="footer"></footer>
+
+<script>
+/* ============================================================
+   SETTINGS — leave OWNER/REPO empty to auto-detect.
+   Fill them in only if auto-detection doesn't work
+   (e.g. you use a custom domain).
+   ============================================================ */
+const SITE_TITLE = "AI Course";
+const OWNER  = "";        // e.g. "yourname"
+const REPO   = "";        // e.g. "my-pages"
+const BRANCH = "";        // leave empty to use the repo's default branch
+const SHOW_ONLY_HTML = false;   // true = list only .html files
+const HIDDEN = ["index.html", "README.md", "LICENSE", "CNAME", ".nojekyll", ".gitignore"];
+/* ============================================================ */
+
+(function () {
+  const $ = (id) => document.getElementById(id);
+
+  // --- Detect owner/repo from GitHub Pages URL -----------------
+  function detect() {
+    if (OWNER && REPO) return { owner: OWNER, repo: REPO };
+    const host = location.hostname;
+    const m = host.match(/^([^.]+)\.github\.io$/i);
+    if (!m) return null;
+    const owner = m[1];
+    const seg = location.pathname.split("/").filter(Boolean)[0];
+    // Project site: owner.github.io/repo/  — User site: owner.github.io/
+    const isProject = seg && !/\.[a-z0-9]+$/i.test(seg);
+    return { owner, repo: isProject ? seg : `${owner}.github.io` };
+  }
+
+  const target = detect();
+  if (!target) {
+    $("content").innerHTML = `<div class="state"><h3>Repository not detected</h3>
+      Open this page from your GitHub Pages URL, or set <code>OWNER</code> and <code>REPO</code> at the top of the script in index.html.</div>`;
+    return;
+  }
+
+  // --- Helpers -------------------------------------------------
+  const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  const fmtSize = (b) => b == null ? "" : b < 1024 ? b + " B" : b < 1048576 ? (b/1024).toFixed(1) + " KB" : (b/1048576).toFixed(1) + " MB";
+  const ext = (n) => (n.includes(".") ? n.split(".").pop().toLowerCase() : "file");
+  const pretty = (n) => n.replace(/\.html?$/i, "").replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+  const COLORS = {
+    html: ["#e34c26", "#fde8e2"], htm: ["#e34c26", "#fde8e2"],
+    css: ["#2965f1", "#e3ebfe"], js: ["#b8960b", "#fcf6d9"], json: ["#6b7280", "#eef0f3"],
+    pdf: ["#d93025", "#fce8e6"], png: ["#0f9d58", "#e3f5ea"], jpg: ["#0f9d58", "#e3f5ea"],
+    jpeg: ["#0f9d58", "#e3f5ea"], gif: ["#0f9d58", "#e3f5ea"], svg: ["#ff9800", "#fff1dc"],
+    webp: ["#0f9d58", "#e3f5ea"], md: ["#6b7280", "#eef0f3"], txt: ["#6b7280", "#eef0f3"],
+  };
+  const badge = (e) => {
+    const [fg, bg] = COLORS[e] || ["#8a5cf6", "#efe9fe"];
+    return `<div class="badge" style="color:${fg};background:${bg}">${esc(e.slice(0,4))}</div>`;
+  };
+  const folderIcon = `<svg class="ic" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-2z"/></svg>`;
+  const arrow = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg>`;
+
+  // --- Fetch (with 5-minute cache to respect GitHub rate limits) ---
+  const CACHE_KEY = `ghidx:${target.owner}/${target.repo}`;
+  async function load() {
+    try {
+      const c = JSON.parse(sessionStorage.getItem(CACHE_KEY) || "null");
+      if (c && Date.now() - c.t < 300000) return c.d;
+    } catch (e) {}
+    const api = `https://api.github.com/repos/${target.owner}/${target.repo}`;
+    const info = await fetch(api).then((r) => { if (!r.ok) throw r; return r.json(); });
+    const branch = BRANCH || info.default_branch;
+    const tree = await fetch(`${api}/git/trees/${encodeURIComponent(branch)}?recursive=1`)
+      .then((r) => { if (!r.ok) throw r; return r.json(); });
+    const d = { info: { description: info.description, url: info.html_url, updated: info.pushed_at }, tree: tree.tree };
+    try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), d })); } catch (e) {}
+    return d;
+  }
+
+  // --- Build a folder tree from the flat list -------------------
+  function build(items) {
+    const root = { name: "", path: "", dirs: {}, files: [] };
+    const isHidden = (p) => p.split("/").some((s) => s.startsWith(".") || s === "node_modules");
+    items.forEach((it) => {
+      if (it.type !== "blob" || isHidden(it.path)) return;
+      const parts = it.path.split("/");
+      const name = parts.pop();
+      if (parts.length === 0 && HIDDEN.includes(name)) return;
+      if (SHOW_ONLY_HTML && !/\.html?$/i.test(name)) return;
+      let node = root;
+      parts.forEach((p, i) => {
+        node.dirs[p] = node.dirs[p] || { name: p, path: parts.slice(0, i + 1).join("/"), dirs: {}, files: [] };
+        node = node.dirs[p];
+      });
+      node.files.push({ name, path: it.path, size: it.size });
+    });
+    return root;
+  }
+  const countFiles = (n) => n.files.length + Object.values(n.dirs).reduce((a, d) => a + countFiles(d), 0);
+  const allFiles = (n) => n.files.concat(...Object.values(n.dirs).map(allFiles));
+
+  // --- Render -------------------------------------------------
+  let ROOT = null;
+
+  function fileRow(f, showPath, q) {
+    const label = q ? highlight(f.name, q) : esc(f.name);
+    const dir = f.path.includes("/") ? f.path.slice(0, f.path.lastIndexOf("/")) : "";
+    const sub = showPath ? (dir ? esc(dir) + "/" : "root") : esc(/\.html?$/i.test(f.name) ? pretty(f.name) : "");
+    const href = f.path.split("/").map(encodeURIComponent).join("/");
+    return `<a class="file" href="${href}" target="_blank" rel="noopener">
+      ${badge(ext(f.name))}
+      <div class="info"><div class="name">${label}</div>${sub ? `<div class="path">${sub}</div>` : ""}</div>
+      <div class="size">${fmtSize(f.size)}</div>
+      <span class="open"><span>Open</span>${arrow}</span>
+    </a>`;
+  }
+  function highlight(text, q) {
+    const i = text.toLowerCase().indexOf(q);
+    if (i < 0) return esc(text);
+    return esc(text.slice(0, i)) + "<mark>" + esc(text.slice(i, i + q.length)) + "</mark>" + esc(text.slice(i + q.length));
+  }
+
+  function currentPath() {
+    return decodeURIComponent(location.hash.replace(/^#\/?/, "")).replace(/\/$/, "");
+  }
+
+  function render() {
+    if (!ROOT) return;
+    const q = $("q").value.trim().toLowerCase();
+    const path = currentPath();
+
+    // find node
+    let node = ROOT;
+    if (path) for (const p of path.split("/")) { node = node && node.dirs[p]; }
+    if (!node) { location.hash = ""; return; }
+
+    // breadcrumbs
+    const parts = path ? path.split("/") : [];
+    let crumbs = `<a href="#/" class="${parts.length ? "" : "current"}">Home</a>`;
+    parts.forEach((p, i) => {
+      const sub = parts.slice(0, i + 1).join("/");
+      crumbs += `<span class="sep">/</span><a href="#/${encodeURI(sub)}" class="${i === parts.length - 1 ? "current" : ""}">${esc(p)}</a>`;
+    });
+    $("crumbs").innerHTML = q ? `<a class="current">Search results</a>` : crumbs;
+
+    let html = "";
+    if (q) {
+      const hits = allFiles(ROOT).filter((f) => f.path.toLowerCase().includes(q));
+      $("stats").innerHTML = `<span><b>${hits.length}</b> match${hits.length === 1 ? "" : "es"}</span>`;
+      html = hits.length
+        ? `<div class="files">${hits.map((f) => fileRow(f, true, q)).join("")}</div>`
+        : `<div class="state"><h3>No files found</h3>Nothing matches “${esc(q)}”.</div>`;
+    } else {
+      const dirs = Object.values(node.dirs).sort((a, b) => a.name.localeCompare(b.name));
+      const files = node.files.slice().sort((a, b) => a.name.localeCompare(b.name));
+      $("stats").innerHTML = `<span><b>${dirs.length}</b> folder${dirs.length === 1 ? "" : "s"}</span><span><b>${files.length}</b> file${files.length === 1 ? "" : "s"}</span>`;
+      if (dirs.length) {
+        html += `<div class="section-title">Folders</div><div class="folders">` +
+          dirs.map((d) => {
+            const n = countFiles(d);
+            return `<a class="folder" href="#/${encodeURI(d.path)}">${folderIcon}
+              <div style="min-width:0"><div class="name">${esc(d.name)}</div><div class="meta">${n} file${n === 1 ? "" : "s"}</div></div></a>`;
+          }).join("") + `</div>`;
+      }
+      if (files.length) {
+        html += `<div class="section-title">Files</div><div class="files">${files.map((f) => fileRow(f, false)).join("")}</div>`;
+      }
+      if (!dirs.length && !files.length) {
+        html = `<div class="state"><h3>This folder is empty</h3>Upload HTML files to your repository and they will appear here.</div>`;
+      }
+    }
+    $("content").innerHTML = html;
+  }
+
+  // --- Init ---------------------------------------------------
+  $("title").textContent = SITE_TITLE;
+  document.title = SITE_TITLE;
+
+  load().then((d) => {
+    ROOT = build(d.tree);
+    if (d.info.description) $("subtitle").textContent = d.info.description;
+    const updated = d.info.updated ? new Date(d.info.updated).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) : "";
+    $("footer").innerHTML = `${countFiles(ROOT)} files${updated ? " · Last updated " + updated : ""} · <a href="${d.info.url}" target="_blank" rel="noopener">View on GitHub</a>`;
+    render();
+  }).catch((err) => {
+    const status = err && err.status;
+    const msg = status === 403
+      ? "GitHub's hourly request limit was reached. Please try again in a few minutes."
+      : status === 404
+      ? `Repository <b>${esc(target.owner)}/${esc(target.repo)}</b> was not found or is private.`
+      : "Could not load the file list. Check your connection and try again.";
+    $("content").innerHTML = `<div class="state"><h3>Unable to load files</h3>${msg}</div>`;
+  });
+
+  window.addEventListener("hashchange", () => { $("q").value = ""; render(); });
+  $("q").addEventListener("input", render);
+})();
+</script>
+</body>
+</html>
